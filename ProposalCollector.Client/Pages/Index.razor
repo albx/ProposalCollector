@@ -1,0 +1,67 @@
+﻿@page "/"
+@inject IProposalServices Service
+
+<PageTitle>Index</PageTitle>
+
+<h1>Submit your proposal!</h1>
+
+@if (!string.IsNullOrWhiteSpace(resultMessage))
+{
+    <div class="row">
+        <div class="alert col-md-12 @(isError ? "alert-danger" : "alert-succes")">
+            @resultMessage
+        </div>
+    </div>
+    <hr />
+}
+
+<EditForm Model="model" role="form" OnValidSubmit="SubmitProposalAsync">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label>Nickname</label>
+        <InputText @bind-Value="model.AuthorNickname" class="form-control" />
+        <ValidationMessage For="@(() => model.AuthorNickname)" />
+    </div>
+
+    <div class="form-group">
+        <label>Title</label>
+        <InputText @bind-Value="model.Title" class="form-control" />
+        <ValidationMessage For="@(() => model.Title)" />
+    </div>
+
+    <div class="form-group">
+        <label>Description</label>
+        <InputTextArea @bind-Value="model.Description"
+                       class="form-control"
+                       rows="10"
+                       placehoder="Please, describe here your idea" />
+        <ValidationMessage For="@(() => model.Description)" />
+    </div>
+
+    <div class="form-group mt-3">
+        <button type="button" class="btn btn-outline-primary">Cancel</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</EditForm>
+
+@code {
+    private ProposalModel model = new();
+
+    private string resultMessage = "";
+    private bool isError = false;
+
+    async Task SubmitProposalAsync()
+    {
+        try
+        {
+            await Service.SubmitProposalAsync(model);
+            resultMessage = "Proposal submitted successfully!";
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            resultMessage = ex.Message;
+        }
+    }
+}
