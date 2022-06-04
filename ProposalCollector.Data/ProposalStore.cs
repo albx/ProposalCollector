@@ -66,5 +66,5 @@ public class ProposalStore : IProposalStore
     }
 
     private string BuildInsertQuery()
-        => "INSERT INTO Proposals(Id, AuthorNickname, Title, Description, SubmittedAt) VALUES(@Id, @AuthorNickname, @Title, @Description, @SubmittedAt)";
+        => "INSERT INTO KITT_Proposals(Id, AuthorNickname, Title, Description, SubmittedAt) VALUES(@Id, @AuthorNickname, @Title, @Description, @SubmittedAt)";
 }

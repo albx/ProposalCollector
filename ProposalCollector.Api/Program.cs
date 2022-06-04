@@ -7,7 +7,11 @@ var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
     .ConfigureServices((context, services) =>
     {
-        services.Configure<ProposalStoreConfiguration>(context.Configuration.GetSection(nameof(ProposalStoreConfiguration)));
+        services.Configure<ProposalStoreConfiguration>(options =>
+        {
+            options.ConnectionString = context.Configuration["KittConnectionString"];
+        });
+
         services.AddScoped<IProposalStore, ProposalStore>();
     })
     .Build();
