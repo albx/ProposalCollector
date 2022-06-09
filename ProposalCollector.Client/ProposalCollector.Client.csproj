@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BlazorUtils\BlazorUtils.csproj" />
     <ProjectReference Include="..\ProposalCollector.Shared\ProposalCollector.Shared.csproj" />
   </ItemGroup>
 

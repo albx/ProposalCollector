@@ -1,4 +1,6 @@
-﻿@inject IJSRuntime Js
+﻿@implements IAsyncDisposable
+
+@inject IJSRuntime Js
 
 <div id="captcha"></div>
 
@@ -10,11 +12,17 @@
     [Parameter]
     public EventCallback<string> OnSuccess { get; set; }
 
+    private IJSObjectReference module;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await Js.InvokeAsync<int>(
+            module = await Js.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/BlazorUtils/Components/Captcha.razor.js");
+
+            await module.InvokeAsync<int>(
                 "initializeCaptcha",
                 DotNetObjectReference.Create(this),
                 "captcha",
@@ -34,5 +42,13 @@
     public async Task Expired(string response)
     {
 
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
     }
 }

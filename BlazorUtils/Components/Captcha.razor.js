@@ -1,4 +1,4 @@
-﻿function initializeCaptcha(dotNetObject, selector, sitekeyValue) {
+﻿export function initializeCaptcha(dotNetObject, selector, sitekeyValue) {
     return grecaptcha.render(selector, {
         'sitekey': sitekeyValue,
         'callback': (response) => { dotNetObject.invokeMethodAsync('Success', response); },
@@ -6,6 +6,6 @@
     });
 }
 
-function getResponse(response) {
+export function getResponse(response) {
     return grecaptcha.getResponse(response);
 }
