@@ -8,7 +8,7 @@
 @if (!string.IsNullOrWhiteSpace(resultMessage))
 {
     <div class="row">
-        <div class="alert col-md-12 @(isError ? "alert-danger" : "alert-succes")">
+        <div class="alert col-md-12 @(isError ? "alert-danger" : "alert-success")">
             @resultMessage
         </div>
     </div>
@@ -39,9 +39,16 @@
         <ValidationMessage For="@(() => model.Description)" />
     </div>
 
+    <div class="form-group mt-2">
+        <div class="col-md-12">
+            <Captcha SiteKey="@siteKey"
+                     OnSuccess="EnableSubmit"/>
+        </div>
+    </div>
+
     <div class="form-group mt-3">
         <button type="button" class="btn btn-outline-primary">Cancel</button>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" disabled="@isSubmitDisabled" class="btn btn-primary">Submit</button>
     </div>
 </EditForm>
 
@@ -50,6 +57,10 @@
 
     private string resultMessage = "";
     private bool isError = false;
+
+    private bool isSubmitDisabled = true;
+
+    private string siteKey = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
 
     async Task SubmitProposalAsync()
     {
@@ -63,5 +74,10 @@
             isError = true;
             resultMessage = ex.Message;
         }
+    }
+
+    void EnableSubmit(string response)
+    {
+        isSubmitDisabled = false;
     }
 }

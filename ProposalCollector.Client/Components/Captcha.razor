@@ -1,0 +1,38 @@
+﻿@inject IJSRuntime Js
+
+<div id="captcha"></div>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public string SiteKey { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSuccess { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Js.InvokeAsync<int>(
+                "initializeCaptcha",
+                DotNetObjectReference.Create(this),
+                "captcha",
+                SiteKey);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    [JSInvokable]
+    public async Task Success(string response)
+    {
+        await OnSuccess.InvokeAsync(response);
+    }
+
+    [JSInvokable]
+    public async Task Expired(string response)
+    {
+
+    }
+}

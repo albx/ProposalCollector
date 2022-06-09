@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProposalCollector.Api", "Pr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProposalCollector.Shared", "ProposalCollector.Shared\ProposalCollector.Shared.csproj", "{03A1ABEF-89F3-43AB-8F1F-4E749A6EC882}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProposalCollector.Data", "ProposalCollector.Data\ProposalCollector.Data.csproj", "{4D4F6AE2-69A2-42B0-889D-BAE406141675}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProposalCollector.Data", "ProposalCollector.Data\ProposalCollector.Data.csproj", "{4D4F6AE2-69A2-42B0-889D-BAE406141675}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
