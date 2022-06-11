@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject IProposalServices Service
+@inject IOptions<CaptchaOptions> CaptchaOptions
 
 <PageTitle>Index</PageTitle>
 
@@ -8,11 +9,11 @@
 @if (!string.IsNullOrWhiteSpace(resultMessage))
 {
     <div class="row">
-        <div class="alert col-md-12 @(isError ? "alert-danger" : "alert-succes")">
+        <div role="alert" class="alert col-md-12 alert-dismissible fade show @(isError ? "alert-danger" : "alert-success")">
             @resultMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
-    <hr />
 }
 
 <EditForm Model="model" role="form" OnValidSubmit="SubmitProposalAsync">
@@ -39,9 +40,16 @@
         <ValidationMessage For="@(() => model.Description)" />
     </div>
 
+    <div class="form-group mt-2">
+        <div class="col-md-12">
+            <Captcha SiteKey="@CaptchaOptions.Value.SiteKey"
+                     OnSuccess="EnableSubmit"/>
+        </div>
+    </div>
+
     <div class="form-group mt-3">
-        <button type="button" class="btn btn-outline-primary">Cancel</button>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" @onclick="Cancel" class="btn btn-outline-primary">Cancel</button>
+        <button type="submit" disabled="@isSubmitDisabled" class="btn btn-primary">Submit</button>
     </div>
 </EditForm>
 
@@ -50,6 +58,8 @@
 
     private string resultMessage = "";
     private bool isError = false;
+
+    private bool isSubmitDisabled = true;
 
     async Task SubmitProposalAsync()
     {
@@ -63,5 +73,12 @@
             isError = true;
             resultMessage = ex.Message;
         }
+    }
+
+    void Cancel() => model = new();
+
+    void EnableSubmit(string response)
+    {
+        isSubmitDisabled = false;
     }
 }

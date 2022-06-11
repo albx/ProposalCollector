@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProposalCollector.Api", "Pr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProposalCollector.Shared", "ProposalCollector.Shared\ProposalCollector.Shared.csproj", "{03A1ABEF-89F3-43AB-8F1F-4E749A6EC882}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProposalCollector.Data", "ProposalCollector.Data\ProposalCollector.Data.csproj", "{4D4F6AE2-69A2-42B0-889D-BAE406141675}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProposalCollector.Data", "ProposalCollector.Data\ProposalCollector.Data.csproj", "{4D4F6AE2-69A2-42B0-889D-BAE406141675}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorUtils", "BlazorUtils\BlazorUtils.csproj", "{B07D4EB3-29FE-4C7E-92D1-BB6E3D742ECE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{4D4F6AE2-69A2-42B0-889D-BAE406141675}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D4F6AE2-69A2-42B0-889D-BAE406141675}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D4F6AE2-69A2-42B0-889D-BAE406141675}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B07D4EB3-29FE-4C7E-92D1-BB6E3D742ECE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B07D4EB3-29FE-4C7E-92D1-BB6E3D742ECE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B07D4EB3-29FE-4C7E-92D1-BB6E3D742ECE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B07D4EB3-29FE-4C7E-92D1-BB6E3D742ECE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
