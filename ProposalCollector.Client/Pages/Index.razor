@@ -43,7 +43,7 @@
     <div class="form-group mt-2">
         <div class="col-md-12">
             <Captcha SiteKey="@CaptchaOptions.Value.SiteKey"
-                     OnSuccess="EnableSubmit"/>
+                     OnSuccess="EnableSubmit" />
         </div>
     </div>
 
@@ -67,11 +67,19 @@
         {
             await Service.SubmitProposalAsync(model);
             resultMessage = "Proposal submitted successfully!";
+
+            model = new();
         }
         catch (Exception ex)
         {
             isError = true;
             resultMessage = ex.Message;
+
+            model = model with { CaptchaResponse = string.Empty };
+        }
+        finally
+        {
+            isSubmitDisabled = true;
         }
     }
 
@@ -79,6 +87,7 @@
 
     void EnableSubmit(string response)
     {
-        isSubmitDisabled = false;
+        model.CaptchaResponse = response;
+        isSubmitDisabled = string.IsNullOrWhiteSpace(response);
     }
 }

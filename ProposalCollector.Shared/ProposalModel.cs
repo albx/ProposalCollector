@@ -2,7 +2,7 @@
 
 namespace ProposalCollector.Shared;
 
-public class ProposalModel
+public record ProposalModel
 {
     public string AuthorNickname { get; set; } = string.Empty;
 
@@ -11,4 +11,7 @@ public class ProposalModel
 
     [Required]
     public string Description { get; set; } = string.Empty;
+
+    [Required]
+    public string CaptchaResponse { get; set; } = string.Empty;
 }

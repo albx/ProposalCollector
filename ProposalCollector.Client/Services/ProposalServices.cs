@@ -26,7 +26,14 @@ public class ProposalServices : IProposalServices
                 proposal.Description,
                 response.StatusCode);
 
-            throw new Exception("Error submitting proposal");
+            var responseContent = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+            var errorMessage = "Error submitting proposal";
+            if (responseContent is not null)
+            {
+                errorMessage = responseContent.ErrorMessage;
+            }
+
+            throw new Exception(errorMessage);
         }
     }
 }
