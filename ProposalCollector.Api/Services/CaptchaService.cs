@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using ProposalCollector.Api.Configuration;
+using ProposalCollector.Api.Models;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace ProposalCollector.Api.Services;
 
@@ -16,7 +16,7 @@ public class CaptchaService
         _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
     }
 
-    public async Task<VerificationResponse> VerifyAsync(string captchaResponse)
+    public async Task<CaptchaVerificationResponse> VerifyAsync(string captchaResponse)
     {
         var client = _httpClientFactory.CreateClient();
 
@@ -34,19 +34,11 @@ public class CaptchaService
             throw new HttpRequestException(responseContent, null, response.StatusCode);
         }
 
-        var verificationResponse = JsonSerializer.Deserialize<VerificationResponse>(responseContent, new JsonSerializerOptions
+        var verificationResponse = JsonSerializer.Deserialize<CaptchaVerificationResponse>(responseContent, new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });
 
-        return verificationResponse ?? VerificationResponse.Failed;
+        return verificationResponse ?? CaptchaVerificationResponse.Failed;
     }
-}
-
-public record VerificationResponse
-{
-    public bool Success { get; set; }
-
-    [JsonIgnore]
-    public static VerificationResponse Failed { get; } = new VerificationResponse { Success = false };
 }

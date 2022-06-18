@@ -22,7 +22,14 @@ var host = new HostBuilder()
             options.VerificationEndpoint = context.Configuration["CaptchaVerificationEndpoint"];
         });
 
+        services.Configure<TextAnalyticsConfiguration>(options =>
+        {
+            options.Endpoint = context.Configuration["TextAnalyticsEndpoint"];
+            options.Key = context.Configuration["TextAnalyticsKey"];
+        });
+
         services.AddScoped<CaptchaService>();
+        services.AddScoped<ITextAnalyticsService, AzureTextAnalyticsService>();
 
         services.AddScoped<IProposalStore, ProposalStore>();
     })
