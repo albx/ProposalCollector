@@ -2,7 +2,7 @@
 
 namespace ProposalCollector.Shared;
 
-public class ProposalModel
+public record ProposalModel
 {
     public string AuthorNickname { get; set; } = string.Empty;
 
