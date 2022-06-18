@@ -1,6 +1,7 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using ProposalCollector.Api.Services;
 using ProposalCollector.Data;
 using ProposalCollector.Shared;
 using System.Net;
@@ -12,11 +13,13 @@ namespace ProposalCollector.Api
     {
         private readonly ILogger _logger;
         private readonly IProposalStore _proposalStore;
+        private readonly CaptchaService _captchaService;
 
-        public SubmitProposalFunction(ILoggerFactory loggerFactory, IProposalStore proposalStore)
+        public SubmitProposalFunction(ILoggerFactory loggerFactory, IProposalStore proposalStore, CaptchaService captchaService)
         {
             _logger = loggerFactory.CreateLogger<SubmitProposalFunction>();
             _proposalStore = proposalStore ?? throw new ArgumentNullException(nameof(proposalStore));
+            _captchaService = captchaService ?? throw new ArgumentNullException(nameof(captchaService));
         }
 
         [Function("SubmitProposal")]
@@ -29,6 +32,12 @@ namespace ProposalCollector.Api
             }
 
             _logger.LogInformation("Submitting proposal with title {Title}, {Description}", model.Title, model.Description);
+
+            var captchaVerificationResponse = await _captchaService.VerifyAsync(model.CaptchaResponse);
+            if (!captchaVerificationResponse.Success)
+            {
+                return req.CreateResponse(HttpStatusCode.BadRequest);
+            }
 
             await _proposalStore.SubmitNewProposal(model.AuthorNickname, model.Title, model.Description);
 

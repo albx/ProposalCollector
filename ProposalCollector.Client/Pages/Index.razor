@@ -67,6 +67,8 @@
         {
             await Service.SubmitProposalAsync(model);
             resultMessage = "Proposal submitted successfully!";
+
+            model = new();
         }
         catch (Exception ex)
         {
@@ -79,6 +81,7 @@
 
     void EnableSubmit(string response)
     {
-        isSubmitDisabled = false;
+        model.CaptchaResponse = response;
+        isSubmitDisabled = string.IsNullOrWhiteSpace(response);
     }
 }
