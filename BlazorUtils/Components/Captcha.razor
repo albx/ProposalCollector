@@ -7,10 +7,13 @@
 @code {
     [Parameter]
     [EditorRequired]
-    public string SiteKey { get; set; }
+    public string SiteKey { get; set; } = string.Empty;
 
     [Parameter]
     public EventCallback<string> OnSuccess { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnExpired { get; set; }
 
     private IJSObjectReference module;
 
@@ -34,15 +37,11 @@
 
     [JSInvokable]
     public async Task Success(string response)
-    {
-        await OnSuccess.InvokeAsync(response);
-    }
+        => await OnSuccess.InvokeAsync(response);
 
     [JSInvokable]
     public async Task Expired(string response)
-    {
-
-    }
+        => await OnExpired.InvokeAsync(response);
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {

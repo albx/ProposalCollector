@@ -1,10 +1,11 @@
 ﻿@page "/"
 @inject IProposalServices Service
 @inject IOptions<CaptchaOptions> CaptchaOptions
+@inject IStringLocalizer<Resources.Pages.Index> Localizer
 
-<PageTitle>Index</PageTitle>
+<PageTitle>@Localizer[nameof(Resources.Pages.Index.PageTitle)]</PageTitle>
 
-<h1>Submit your proposal!</h1>
+<h1>@Localizer[nameof(Resources.Pages.Index.PageTitle)]!</h1>
 
 @if (!string.IsNullOrWhiteSpace(resultMessage))
 {
@@ -20,19 +21,19 @@
     <DataAnnotationsValidator />
 
     <div class="form-group">
-        <label>Nickname</label>
+        <label>@Localizer[nameof(Resources.Pages.Index.NicknameLabel)]</label>
         <InputText @bind-Value="model.AuthorNickname" class="form-control" />
         <ValidationMessage For="@(() => model.AuthorNickname)" />
     </div>
 
     <div class="form-group">
-        <label>Title</label>
+        <label>@Localizer[nameof(Resources.Pages.Index.TitleLabel)]</label>
         <InputText @bind-Value="model.Title" class="form-control" />
         <ValidationMessage For="@(() => model.Title)" />
     </div>
 
     <div class="form-group">
-        <label>Description</label>
+        <label>@Localizer[nameof(Resources.Pages.Index.DescriptionLabel)]</label>
         <InputTextArea @bind-Value="model.Description"
                        class="form-control"
                        rows="10"
@@ -48,8 +49,8 @@
     </div>
 
     <div class="form-group mt-3">
-        <button type="button" @onclick="Cancel" class="btn btn-outline-primary">Cancel</button>
-        <button type="submit" disabled="@isSubmitDisabled" class="btn btn-primary">Submit</button>
+        <button type="button" @onclick="Cancel" class="btn btn-outline-primary">@Localizer[nameof(Resources.Pages.Index.CancelLabel)]</button>
+        <button type="submit" disabled="@isSubmitDisabled" class="btn btn-primary">@Localizer[nameof(Resources.Pages.Index.SubmitLabel)]</button>
     </div>
 </EditForm>
 
@@ -66,7 +67,7 @@
         try
         {
             await Service.SubmitProposalAsync(model);
-            resultMessage = "Proposal submitted successfully!";
+            resultMessage = Localizer[nameof(Resources.Pages.Index.ProposalSubmittedSuccessfully)];
 
             model = new();
         }
