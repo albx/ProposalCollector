@@ -8,7 +8,7 @@
       "appBuildCommand": "dotnet publish -c Release -o bin",
       "apiBuildCommand": "dotnet publish -c Release",
       "run": "dotnet watch run",
-      "appDevserverUrl": "https://localhost:7203"
+      "appDevserverUrl": "http://localhost:5024"
     }
   }
 }

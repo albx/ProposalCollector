@@ -4,12 +4,12 @@ using Microsoft.Extensions.Logging;
 using ProposalCollector.Api.Services;
 using ProposalCollector.Data;
 using ProposalCollector.Shared;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Text.Json;
 
 namespace ProposalCollector.Api;
 
-public class SubmitProposalFunction
+public partial class SubmitProposalFunction
 {
     private readonly ILogger _logger;
     private readonly IProposalStore _proposalStore;
@@ -31,10 +31,19 @@ public class SubmitProposalFunction
     [Function("SubmitProposal")]
     public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
     {
-        var model = await ParseRequestBodyAsync(req);
-        if (model is null)
+        var model = await req.ReadFromJsonAsync<ProposalModel>();
+        var validationResult = ValidateModel(model);
+        if (!validationResult.IsValid)
         {
-            return req.CreateResponse(HttpStatusCode.BadRequest);
+            var validationResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+            if (!string.IsNullOrWhiteSpace(validationResult.ErrorMessage))
+            {
+                await validationResponse.WriteAsJsonAsync(
+                    new ErrorResponse(validationResult.ErrorMessage),
+                    HttpStatusCode.BadRequest);
+            }
+
+            return validationResponse;
         }
 
         _logger.LogInformation("Submitting proposal with title {Title}, {Description}", model.Title, model.Description);
@@ -48,9 +57,10 @@ public class SubmitProposalFunction
         var sentimentAnalysis = await _textAnalyticsService.AnalyzeAsync(model.Description);
         if (sentimentAnalysis == Models.TextAnalyticsResponse.Negative)
         {
-            var sentimentAnalysisResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-            await sentimentAnalysisResponse.WriteAsJsonAsync(new ErrorResponse("Your text is negative"));
-            sentimentAnalysisResponse.StatusCode = HttpStatusCode.BadRequest;
+            var sentimentAnalysisResponse = req.CreateResponse();
+            await sentimentAnalysisResponse.WriteAsJsonAsync(
+                new ErrorResponse("Your text is negative"),
+                HttpStatusCode.BadRequest);
 
             return sentimentAnalysisResponse;
         }
@@ -63,15 +73,23 @@ public class SubmitProposalFunction
         return response;
     }
 
-    private async Task<ProposalModel?> ParseRequestBodyAsync(HttpRequestData req)
+    private Models.ValidationResult ValidateModel(ProposalModel? model)
     {
-        using var reader = new StreamReader(req.Body);
-        var requestBody = await reader.ReadToEndAsync();
-
-        var model = JsonSerializer.Deserialize<ProposalModel>(requestBody, new JsonSerializerOptions
+        if (model is null)
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-        return model;
+            return new Models.ValidationResult(false, null);
+        }
+
+        try
+        {
+            var context = new ValidationContext(model);
+            Validator.ValidateObject(model, context, true);
+
+            return Models.ValidationResult.Success;
+        }
+        catch (ValidationException ex)
+        {
+            return new Models.ValidationResult(false, ex.Message);
+        }
     }
 }
