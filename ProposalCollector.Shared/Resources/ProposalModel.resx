@@ -117,28 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CancelLabel" xml:space="preserve">
-    <value>Cancel</value>
+  <data name="Description" xml:space="preserve">
+    <value>Description is required</value>
   </data>
-  <data name="DescriptionLabel" xml:space="preserve">
-    <value>Description</value>
-  </data>
-  <data name="DescriptionPlaceholder" xml:space="preserve">
-    <value>Please, describe here your idea</value>
-  </data>
-  <data name="NicknameLabel" xml:space="preserve">
-    <value>Nickname</value>
-  </data>
-  <data name="PageTitle" xml:space="preserve">
-    <value>Submit your proposal</value>
-  </data>
-  <data name="ProposalSubmittedSuccessfully" xml:space="preserve">
-    <value>Proposal submitted successfully! Thank you for your contribution</value>
-  </data>
-  <data name="SubmitLabel" xml:space="preserve">
-    <value>Submit</value>
-  </data>
-  <data name="TitleLabel" xml:space="preserve">
-    <value>Title</value>
+  <data name="Title" xml:space="preserve">
+    <value>Title is required</value>
   </data>
 </root>

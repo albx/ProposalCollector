@@ -37,7 +37,7 @@
         <InputTextArea @bind-Value="model.Description"
                        class="form-control"
                        rows="10"
-                       placeholder="Please, describe here your idea" />
+                       placeholder="@Localizer[nameof(Resources.Pages.Index.DescriptionPlaceholder)]" />
         <ValidationMessage For="@(() => model.Description)" />
     </div>
 

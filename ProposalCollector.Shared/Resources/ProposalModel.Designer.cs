@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ProposalCollector.Client.Resources.Pages {
+namespace ProposalCollector.Shared.Resources {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace ProposalCollector.Client.Resources.Pages {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Index {
+    internal class ProposalModel {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Index() {
+        internal ProposalModel() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace ProposalCollector.Client.Resources.Pages {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ProposalCollector.Client.Resources.Pages.Index", typeof(Index).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ProposalCollector.Shared.Resources.ProposalModel", typeof(ProposalModel).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,74 +61,20 @@ namespace ProposalCollector.Client.Resources.Pages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cancel.
+        ///   Looks up a localized string similar to Description is required.
         /// </summary>
-        internal static string CancelLabel {
+        internal static string Description {
             get {
-                return ResourceManager.GetString("CancelLabel", resourceCulture);
+                return ResourceManager.GetString("Description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Description.
+        ///   Looks up a localized string similar to Title is required.
         /// </summary>
-        internal static string DescriptionLabel {
+        internal static string Title {
             get {
-                return ResourceManager.GetString("DescriptionLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please, describe here your idea.
-        /// </summary>
-        internal static string DescriptionPlaceholder {
-            get {
-                return ResourceManager.GetString("DescriptionPlaceholder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Nickname.
-        /// </summary>
-        internal static string NicknameLabel {
-            get {
-                return ResourceManager.GetString("NicknameLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Submit your proposal.
-        /// </summary>
-        internal static string PageTitle {
-            get {
-                return ResourceManager.GetString("PageTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Proposal submitted successfully! Thank you for your contribution.
-        /// </summary>
-        internal static string ProposalSubmittedSuccessfully {
-            get {
-                return ResourceManager.GetString("ProposalSubmittedSuccessfully", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Submit.
-        /// </summary>
-        internal static string SubmitLabel {
-            get {
-                return ResourceManager.GetString("SubmitLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Title.
-        /// </summary>
-        internal static string TitleLabel {
-            get {
-                return ResourceManager.GetString("TitleLabel", resourceCulture);
+                return ResourceManager.GetString("Title", resourceCulture);
             }
         }
     }

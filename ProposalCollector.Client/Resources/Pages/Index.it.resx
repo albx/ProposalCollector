@@ -123,6 +123,9 @@
   <data name="DescriptionLabel" xml:space="preserve">
     <value>Descrizione</value>
   </data>
+  <data name="DescriptionPlaceholder" xml:space="preserve">
+    <value>Descrivi qui la tua idea</value>
+  </data>
   <data name="NicknameLabel" xml:space="preserve">
     <value>Nickname</value>
   </data>
