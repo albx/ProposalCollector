@@ -2,7 +2,14 @@
 
 @inject IJSRuntime Js
 
-<div id="captcha"></div>
+@if (string.IsNullOrWhiteSpace(Value))
+{
+    <button class="btn btn-outline-secondary btn-lg" @onclick="VerifyCaptchaAsync" type="button">@ButtonText</button>
+}
+else
+{
+    @ChildContent
+}
 
 @code {
     [Parameter]
@@ -10,12 +17,24 @@
     public string SiteKey { get; set; } = string.Empty;
 
     [Parameter]
-    public EventCallback<string> OnSuccess { get; set; }
+    public RenderFragment ChildContent { get; set; }
 
     [Parameter]
-    public EventCallback<string> OnExpired { get; set; }
+    public string ButtonText { get; set; } = string.Empty;
 
-    private IJSObjectReference module;
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    private IJSObjectReference module = default!;
+
+    private async Task VerifyCaptchaAsync()
+    {
+        var token = await module.InvokeAsync<string>("execute", SiteKey);
+        await ValueChanged.InvokeAsync(token);
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -25,28 +44,19 @@
                 "import",
                 "./_content/BlazorUtils/Components/Captcha.razor.js");
 
-            await module.InvokeAsync<int>(
-                "initializeCaptcha",
-                DotNetObjectReference.Create(this),
-                "captcha",
+            await module.InvokeVoidAsync(
+                "init",
                 SiteKey);
         }
 
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    [JSInvokable]
-    public async Task Success(string response)
-        => await OnSuccess.InvokeAsync(response);
-
-    [JSInvokable]
-    public async Task Expired(string response)
-        => await OnExpired.InvokeAsync(response);
-
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         if (module is not null)
         {
+            await module.InvokeVoidAsync("removeScript");
             await module.DisposeAsync();
         }
     }

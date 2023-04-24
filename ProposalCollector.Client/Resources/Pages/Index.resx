@@ -120,6 +120,9 @@
   <data name="CancelLabel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="CaptchaButtonText" xml:space="preserve">
+    <value>I'm not a robot</value>
+  </data>
   <data name="DescriptionLabel" xml:space="preserve">
     <value>Description</value>
   </data>
