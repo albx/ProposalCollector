@@ -39,7 +39,7 @@ public class ProposalStore : IProposalStore
         using var connection = new SqlConnection(_configuration.ConnectionString);
         connection.Open();
 
-        var command = connection.CreateCommand();
+        using var command = connection.CreateCommand();
         command.CommandText = BuildInsertQuery();
         SetQueryParametersToCommand(command, proposal);
 

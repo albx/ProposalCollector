@@ -4,7 +4,7 @@
 
 @if (string.IsNullOrWhiteSpace(Value))
 {
-    <button class="btn btn-primary" @onclick="VerifyCaptchaAsync" type="button">Submit</button>
+    <button class="btn btn-outline-secondary btn-lg" @onclick="VerifyCaptchaAsync" type="button">@ButtonText</button>
 }
 else
 {
@@ -20,12 +20,15 @@ else
     public RenderFragment ChildContent { get; set; }
 
     [Parameter]
-    public string Value { get; set; }
+    public string ButtonText { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
 
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
 
-    private IJSObjectReference module;
+    private IJSObjectReference module = default!;
 
     private async Task VerifyCaptchaAsync()
     {

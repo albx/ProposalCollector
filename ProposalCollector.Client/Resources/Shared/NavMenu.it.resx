@@ -117,31 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CancelLabel" xml:space="preserve">
-    <value>Annulla</value>
-  </data>
-  <data name="CaptchaButtonText" xml:space="preserve">
-    <value>Non sono un robot</value>
-  </data>
-  <data name="DescriptionLabel" xml:space="preserve">
-    <value>Descrizione</value>
-  </data>
-  <data name="DescriptionPlaceholder" xml:space="preserve">
-    <value>Descrivi qui la tua idea</value>
-  </data>
-  <data name="NicknameLabel" xml:space="preserve">
-    <value>Nickname</value>
-  </data>
-  <data name="PageTitle" xml:space="preserve">
+  <data name="SubmitMenuItemText" xml:space="preserve">
     <value>Invia la tua proposta</value>
-  </data>
-  <data name="ProposalSubmittedSuccessfully" xml:space="preserve">
-    <value>La tua proposta è stata inviata con successo! Grazie per il contributo</value>
-  </data>
-  <data name="SubmitLabel" xml:space="preserve">
-    <value>Invia</value>
-  </data>
-  <data name="TitleLabel" xml:space="preserve">
-    <value>Titolo</value>
   </data>
 </root>

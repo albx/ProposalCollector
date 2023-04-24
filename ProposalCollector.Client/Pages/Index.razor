@@ -44,15 +44,13 @@
 
     <div class="form-group mt-2">
         <div class="col-md-12">
-            <Captcha SiteKey="@CaptchaOptions.Value.SiteKey" @bind-Value="model.CaptchaResponse">
+            <Captcha SiteKey="@CaptchaOptions.Value.SiteKey" 
+                     @bind-Value="model.CaptchaResponse"
+                     ButtonText="@Localizer[nameof(Resources.Pages.Index.CaptchaButtonText)]">
                 <button type="button" @onclick="Cancel" class="btn btn-outline-primary">@Localizer[nameof(Resources.Pages.Index.CancelLabel)]</button>
                 <button type="submit" class="btn btn-primary">@Localizer[nameof(Resources.Pages.Index.SubmitLabel)]</button>
             </Captcha>
         </div>
-    </div>
-
-    <div class="form-group mt-3">
-        
     </div>
 </EditForm>
 
@@ -61,8 +59,6 @@
 
     private string resultMessage = "";
     private bool isError = false;
-
-    private bool isSubmitDisabled = true;
 
     async Task SubmitProposalAsync()
     {
@@ -80,17 +76,7 @@
 
             model = model with { CaptchaResponse = string.Empty };
         }
-        finally
-        {
-            isSubmitDisabled = true;
-        }
     }
 
     void Cancel() => model = new();
-
-    void EnableSubmit(string response)
-    {
-        model.CaptchaResponse = response;
-        isSubmitDisabled = string.IsNullOrWhiteSpace(response);
-    }
 }

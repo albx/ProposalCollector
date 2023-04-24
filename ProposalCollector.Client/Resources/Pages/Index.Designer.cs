@@ -70,6 +70,15 @@ namespace ProposalCollector.Client.Resources.Pages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I&apos;m not a robot.
+        /// </summary>
+        internal static string CaptchaButtonText {
+            get {
+                return ResourceManager.GetString("CaptchaButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Description.
         /// </summary>
         internal static string DescriptionLabel {
