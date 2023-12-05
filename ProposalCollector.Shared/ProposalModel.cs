@@ -12,6 +12,5 @@ public record ProposalModel
     [Required(ErrorMessageResourceName = nameof(Description), ErrorMessageResourceType = typeof(Resources.ProposalModel))]
     public string Description { get; set; } = string.Empty;
 
-    [Required]
     public string CaptchaResponse { get; set; } = string.Empty;
 }
