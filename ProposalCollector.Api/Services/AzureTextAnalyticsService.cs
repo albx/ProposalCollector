@@ -33,7 +33,7 @@ public class AzureTextAnalyticsService : ITextAnalyticsService
         return ConvertAnalysisResponse(analysisResponse);
     }
 
-    private TextAnalyticsResponse ConvertAnalysisResponse(Response<DocumentSentiment> analysisResponse)
+    private static TextAnalyticsResponse ConvertAnalysisResponse(Response<DocumentSentiment> analysisResponse)
     {
         if (analysisResponse is null)
         {

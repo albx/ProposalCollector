@@ -1,0 +1,23 @@
+﻿@if (Loading)
+{
+    <div class="d-flex align-items-center">
+        <div class="spinner-border text-primary" role="status"></div>
+        <span class="m-2 text-primary fw-bolder">@LoadingText</span>
+    </div>
+}
+else
+{
+    @ChildContent
+}
+
+
+@code {
+    [Parameter]
+    public bool Loading { get; set; }
+
+    [Parameter]
+    public string LoadingText { get; set; } = "Loading...";
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = default!;
+}

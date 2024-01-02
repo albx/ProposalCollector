@@ -97,6 +97,15 @@ namespace ProposalCollector.Client.Resources.Pages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sending....
+        /// </summary>
+        internal static string LoadingText {
+            get {
+                return ResourceManager.GetString("LoadingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Nickname.
         /// </summary>
         internal static string NicknameLabel {

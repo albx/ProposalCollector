@@ -43,10 +43,12 @@
     </div>
 
     <div class="form-group mt-2">
-        <div class="col-md-12">
-            <button type="button" @onclick="Cancel" class="btn btn-outline-primary">@Localizer[nameof(Resources.Pages.Index.CancelLabel)]</button>
-            <button type="submit" class="btn btn-primary">@Localizer[nameof(Resources.Pages.Index.SubmitLabel)]</button>
-        </div>
+        <Loader Loading="submitting" LoadingText="@Localizer[nameof(Resources.Pages.Index.LoadingText)]">
+            <div class="col-md-12">
+                <button type="button" @onclick="Cancel" class="btn btn-outline-primary">@Localizer[nameof(Resources.Pages.Index.CancelLabel)]</button>
+                <button type="submit" class="btn btn-primary">@Localizer[nameof(Resources.Pages.Index.SubmitLabel)]</button>
+            </div>
+        </Loader>
     </div>
 </EditForm>
 
@@ -56,11 +58,15 @@
     private string resultMessage = "";
     private bool isError = false;
 
+    private bool submitting = false;
+
     async Task SubmitProposalAsync()
     {
+        submitting = true;
+
         try
         {
-            var result = await ReCaptcha.VerifyAsync("submit");
+            var result = await ReCaptcha.VerifyAsync(ProposalModel.ReCaptchaAction);
             if (!result.Succeeded)
             {
                 isError = true;
@@ -82,6 +88,10 @@
             resultMessage = ex.Message;
 
             model = model with { CaptchaResponse = string.Empty };
+        }
+        finally
+        {
+            submitting = false;
         }
     }
 

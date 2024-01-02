@@ -1,3 +1,4 @@
+using KITT.Web.ReCaptcha.Http.v3;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -9,22 +10,22 @@ using System.Net;
 
 namespace ProposalCollector.Api;
 
-public partial class SubmitProposalFunction
+public class SubmitProposalFunction
 {
     private readonly ILogger _logger;
     private readonly IProposalStore _proposalStore;
-    private readonly CaptchaService _captchaService;
+    private readonly ReCaptchaService _reCaptchaService;
     private readonly ITextAnalyticsService _textAnalyticsService;
 
     public SubmitProposalFunction(
         ILoggerFactory loggerFactory,
         IProposalStore proposalStore,
-        CaptchaService captchaService,
+        ReCaptchaService reCaptchaService,
         ITextAnalyticsService textAnalyticsService)
     {
         _logger = loggerFactory.CreateLogger<SubmitProposalFunction>();
         _proposalStore = proposalStore ?? throw new ArgumentNullException(nameof(proposalStore));
-        _captchaService = captchaService ?? throw new ArgumentNullException(nameof(captchaService));
+        _reCaptchaService = reCaptchaService ?? throw new ArgumentNullException(nameof(reCaptchaService));
         _textAnalyticsService = textAnalyticsService ?? throw new ArgumentNullException(nameof(textAnalyticsService));
     }
 
@@ -35,7 +36,7 @@ public partial class SubmitProposalFunction
         var validationResult = ValidateModel(model);
         if (!validationResult.IsValid)
         {
-            var validationResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+            var validationResponse = req.CreateResponse();
             if (!string.IsNullOrWhiteSpace(validationResult.ErrorMessage))
             {
                 await validationResponse.WriteAsJsonAsync(
@@ -46,12 +47,20 @@ public partial class SubmitProposalFunction
             return validationResponse;
         }
 
-        _logger.LogInformation("Submitting proposal with title {Title}, {Description}", model.Title, model.Description);
+        _logger.LogInformation("Submitting proposal with title {Title}, {Description}", model!.Title, model.Description);
 
-        var captchaVerificationResponse = await _captchaService.VerifyAsync(model.CaptchaResponse);
+        var captchaVerificationResponse = await _reCaptchaService.VerifyAsync(
+            model.CaptchaResponse,
+            ProposalModel.ReCaptchaAction);
+
         if (!captchaVerificationResponse.Success)
         {
-            return req.CreateResponse(HttpStatusCode.BadRequest);
+            var reCaptchaValidationResponse = req.CreateResponse();
+            await reCaptchaValidationResponse.WriteAsJsonAsync(
+                new ErrorResponse(captchaVerificationResponse.ErrorCodes.First()),
+                HttpStatusCode.BadRequest);
+
+            return reCaptchaValidationResponse;
         }
 
         var sentimentAnalysis = await _textAnalyticsService.AnalyzeAsync(model.Description);
@@ -73,7 +82,7 @@ public partial class SubmitProposalFunction
         return response;
     }
 
-    private Models.ValidationResult ValidateModel(ProposalModel? model)
+    private static Models.ValidationResult ValidateModel(ProposalModel? model)
     {
         if (model is null)
         {
