@@ -49,37 +49,79 @@ public class SubmitProposalFunction
 
         _logger.LogInformation("Submitting proposal with title {Title}, {Description}", model!.Title, model.Description);
 
-        var captchaVerificationResponse = await _reCaptchaService.VerifyAsync(
-            model.CaptchaResponse,
-            ProposalModel.ReCaptchaAction);
-
-        if (!captchaVerificationResponse.Success)
+        try
         {
-            var reCaptchaValidationResponse = req.CreateResponse();
-            await reCaptchaValidationResponse.WriteAsJsonAsync(
-                new ErrorResponse(captchaVerificationResponse.ErrorCodes.First()),
+            await VerifyReCaptchaAsync(model);
+            await AnalyzeSentimentAnalysisAsync(model);
+
+            await _proposalStore.SubmitNewProposal(model.AuthorNickname, model.Title, model.Description);
+
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            response.Headers.Add("Content-Type", "application/json");
+
+            return response;
+        }
+        catch (ValidationException ex)
+        {
+            var validationErrorResponse = req.CreateResponse();
+            await validationErrorResponse.WriteAsJsonAsync(
+                new ErrorResponse(ex.Message),
                 HttpStatusCode.BadRequest);
 
-            return reCaptchaValidationResponse;
+            return validationErrorResponse;
         }
-
-        var sentimentAnalysis = await _textAnalyticsService.AnalyzeAsync(model.Description);
-        if (sentimentAnalysis == Models.TextAnalyticsResponse.Negative)
+        catch (Exception ex)
         {
-            var sentimentAnalysisResponse = req.CreateResponse();
-            await sentimentAnalysisResponse.WriteAsJsonAsync(
-                new ErrorResponse("Your text is negative"),
-                HttpStatusCode.BadRequest);
+            var serverErrorResponse = req.CreateResponse();
+            await serverErrorResponse.WriteAsJsonAsync(
+                new ErrorResponse(ex.Message),
+                HttpStatusCode.InternalServerError);
 
-            return sentimentAnalysisResponse;
+            return serverErrorResponse;
         }
+    }
 
-        await _proposalStore.SubmitNewProposal(model.AuthorNickname, model.Title, model.Description);
+    private async Task VerifyReCaptchaAsync(ProposalModel model)
+    {
+        try
+        {
+            var captchaVerificationResponse = await _reCaptchaService.VerifyAsync(
+                model.CaptchaResponse,
+                ProposalModel.ReCaptchaAction);
 
-        var response = req.CreateResponse(HttpStatusCode.OK);
-        response.Headers.Add("Content-Type", "application/json");
+            if (!captchaVerificationResponse.Success)
+            {
+                throw new ValidationException(captchaVerificationResponse.ErrorCodes.First());
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            //this exception could happen if the reCaptcha action does not match.
+            _logger.LogError(ex, "Invalid operation during reCaptcha verification: {ErrorMessage}", ex.Message);
+            throw new ValidationException(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error verifying reCatpcha: {ErrorMessage}", ex.Message);
+            throw;
+        }
+    }
 
-        return response;
+    private async Task AnalyzeSentimentAnalysisAsync(ProposalModel model)
+    {
+        try
+        {
+            var sentimentAnalysis = await _textAnalyticsService.AnalyzeAsync(model.Description);
+            if (sentimentAnalysis == Models.TextAnalyticsResponse.Negative)
+            {
+                throw new ValidationException("Your text is negative");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error analyzing sentiment analysis: {ErrorMessage}", ex.Message);
+            throw;
+        }
     }
 
     private static Models.ValidationResult ValidateModel(ProposalModel? model)
