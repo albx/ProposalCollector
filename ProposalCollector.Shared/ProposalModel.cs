@@ -13,4 +13,6 @@ public record ProposalModel
     public string Description { get; set; } = string.Empty;
 
     public string CaptchaResponse { get; set; } = string.Empty;
+
+    public const string ReCaptchaAction = "submit";
 }

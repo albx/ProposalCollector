@@ -129,6 +129,9 @@
   <data name="DescriptionPlaceholder" xml:space="preserve">
     <value>Please, describe here your idea</value>
   </data>
+  <data name="LoadingText" xml:space="preserve">
+    <value>Sending...</value>
+  </data>
   <data name="NicknameLabel" xml:space="preserve">
     <value>Nickname</value>
   </data>

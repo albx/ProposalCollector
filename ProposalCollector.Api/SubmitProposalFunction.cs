@@ -1,3 +1,4 @@
+using KITT.Web.ReCaptcha.Http.v3;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -9,22 +10,22 @@ using System.Net;
 
 namespace ProposalCollector.Api;
 
-public partial class SubmitProposalFunction
+public class SubmitProposalFunction
 {
     private readonly ILogger _logger;
     private readonly IProposalStore _proposalStore;
-    private readonly CaptchaService _captchaService;
+    private readonly ReCaptchaService _reCaptchaService;
     private readonly ITextAnalyticsService _textAnalyticsService;
 
     public SubmitProposalFunction(
         ILoggerFactory loggerFactory,
         IProposalStore proposalStore,
-        CaptchaService captchaService,
+        ReCaptchaService reCaptchaService,
         ITextAnalyticsService textAnalyticsService)
     {
         _logger = loggerFactory.CreateLogger<SubmitProposalFunction>();
         _proposalStore = proposalStore ?? throw new ArgumentNullException(nameof(proposalStore));
-        _captchaService = captchaService ?? throw new ArgumentNullException(nameof(captchaService));
+        _reCaptchaService = reCaptchaService ?? throw new ArgumentNullException(nameof(reCaptchaService));
         _textAnalyticsService = textAnalyticsService ?? throw new ArgumentNullException(nameof(textAnalyticsService));
     }
 
@@ -35,7 +36,7 @@ public partial class SubmitProposalFunction
         var validationResult = ValidateModel(model);
         if (!validationResult.IsValid)
         {
-            var validationResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+            var validationResponse = req.CreateResponse();
             if (!string.IsNullOrWhiteSpace(validationResult.ErrorMessage))
             {
                 await validationResponse.WriteAsJsonAsync(
@@ -46,34 +47,84 @@ public partial class SubmitProposalFunction
             return validationResponse;
         }
 
-        _logger.LogInformation("Submitting proposal with title {Title}, {Description}", model.Title, model.Description);
+        _logger.LogInformation("Submitting proposal with title {Title}, {Description}", model!.Title, model.Description);
 
-        var captchaVerificationResponse = await _captchaService.VerifyAsync(model.CaptchaResponse);
-        if (!captchaVerificationResponse.Success)
+        try
         {
-            return req.CreateResponse(HttpStatusCode.BadRequest);
+            await VerifyReCaptchaAsync(model);
+            await AnalyzeSentimentAnalysisAsync(model);
+
+            await _proposalStore.SubmitNewProposal(model.AuthorNickname, model.Title, model.Description);
+
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            response.Headers.Add("Content-Type", "application/json");
+
+            return response;
         }
-
-        var sentimentAnalysis = await _textAnalyticsService.AnalyzeAsync(model.Description);
-        if (sentimentAnalysis == Models.TextAnalyticsResponse.Negative)
+        catch (ValidationException ex)
         {
-            var sentimentAnalysisResponse = req.CreateResponse();
-            await sentimentAnalysisResponse.WriteAsJsonAsync(
-                new ErrorResponse("Your text is negative"),
+            var validationErrorResponse = req.CreateResponse();
+            await validationErrorResponse.WriteAsJsonAsync(
+                new ErrorResponse(ex.Message),
                 HttpStatusCode.BadRequest);
 
-            return sentimentAnalysisResponse;
+            return validationErrorResponse;
         }
+        catch (Exception ex)
+        {
+            var serverErrorResponse = req.CreateResponse();
+            await serverErrorResponse.WriteAsJsonAsync(
+                new ErrorResponse(ex.Message),
+                HttpStatusCode.InternalServerError);
 
-        await _proposalStore.SubmitNewProposal(model.AuthorNickname, model.Title, model.Description);
-
-        var response = req.CreateResponse(HttpStatusCode.OK);
-        response.Headers.Add("Content-Type", "application/json");
-
-        return response;
+            return serverErrorResponse;
+        }
     }
 
-    private Models.ValidationResult ValidateModel(ProposalModel? model)
+    private async Task VerifyReCaptchaAsync(ProposalModel model)
+    {
+        try
+        {
+            var captchaVerificationResponse = await _reCaptchaService.VerifyAsync(
+                model.CaptchaResponse,
+                ProposalModel.ReCaptchaAction);
+
+            if (!captchaVerificationResponse.Success)
+            {
+                throw new ValidationException(captchaVerificationResponse.ErrorCodes.First());
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            //this exception could happen if the reCaptcha action does not match.
+            _logger.LogError(ex, "Invalid operation during reCaptcha verification: {ErrorMessage}", ex.Message);
+            throw new ValidationException(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error verifying reCatpcha: {ErrorMessage}", ex.Message);
+            throw;
+        }
+    }
+
+    private async Task AnalyzeSentimentAnalysisAsync(ProposalModel model)
+    {
+        try
+        {
+            var sentimentAnalysis = await _textAnalyticsService.AnalyzeAsync(model.Description);
+            if (sentimentAnalysis == Models.TextAnalyticsResponse.Negative)
+            {
+                throw new ValidationException("Your text is negative");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error analyzing sentiment analysis: {ErrorMessage}", ex.Message);
+            throw;
+        }
+    }
+
+    private static Models.ValidationResult ValidateModel(ProposalModel? model)
     {
         if (model is null)
         {
