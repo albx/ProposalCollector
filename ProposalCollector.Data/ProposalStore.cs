@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
+using Microsoft.Data.SqlClient;
 using ProposalCollector.Data.Configuration;
 using ProposalCollector.Data.Models;
 using System.Data;
-using System.Data.SqlClient;
 
 namespace ProposalCollector.Data;
 

@@ -55,7 +55,7 @@
 @code {
     private ProposalModel model = new();
 
-    private string resultMessage = "";
+    private string resultMessage = string.Empty;
     private bool isError = false;
 
     private bool submitting = false;
@@ -63,6 +63,7 @@
     async Task SubmitProposalAsync()
     {
         submitting = true;
+        isError = false;
 
         try
         {
