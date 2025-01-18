@@ -21,19 +21,19 @@
 <EditForm Model="model" role="form" OnValidSubmit="SubmitProposalAsync">
     <DataAnnotationsValidator />
 
-    <div class="form-group">
+    <div class="form-group mb-2">
         <label>@Localizer[nameof(Resources.Pages.Index.NicknameLabel)]</label>
         <InputText @bind-Value="model.AuthorNickname" class="form-control" />
         <ValidationMessage For="@(() => model.AuthorNickname)" />
     </div>
 
-    <div class="form-group">
+    <div class="form-group mb-2">
         <label>@Localizer[nameof(Resources.Pages.Index.TitleLabel)]</label>
         <InputText @bind-Value="model.Title" class="form-control" />
         <ValidationMessage For="@(() => model.Title)" />
     </div>
 
-    <div class="form-group">
+    <div class="form-group mb-2">
         <label>@Localizer[nameof(Resources.Pages.Index.DescriptionLabel)]</label>
         <InputTextArea @bind-Value="model.Description"
                        class="form-control"
@@ -42,7 +42,7 @@
         <ValidationMessage For="@(() => model.Description)" />
     </div>
 
-    <div class="form-group mt-2">
+    <div class="form-group mb-2">
         <Loader Loading="submitting" LoadingText="@Localizer[nameof(Resources.Pages.Index.LoadingText)]">
             <div class="col-md-12">
                 <button type="button" @onclick="Cancel" class="btn btn-outline-primary">@Localizer[nameof(Resources.Pages.Index.CancelLabel)]</button>

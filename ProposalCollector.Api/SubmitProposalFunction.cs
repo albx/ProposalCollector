@@ -1,4 +1,6 @@
 using KITT.Web.ReCaptcha.Http.v3;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -30,19 +32,20 @@ public class SubmitProposalFunction
     }
 
     [Function("SubmitProposal")]
-    public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+    public async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest request)
     {
-        var model = await req.ReadFromJsonAsync<ProposalModel>();
+        var model = await request.ReadFromJsonAsync<ProposalModel>();
         var validationResult = ValidateModel(model);
         if (!validationResult.IsValid)
         {
-            var validationResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+            var errorMessage = "Invalid data";
             if (!string.IsNullOrWhiteSpace(validationResult.ErrorMessage))
             {
-                await validationResponse.WriteAsJsonAsync(new ErrorResponse(validationResult.ErrorMessage));
+                errorMessage = validationResult.ErrorMessage;
             }
 
-            return validationResponse;
+            return new BadRequestObjectResult(new ErrorResponse(errorMessage));
         }
 
         _logger.LogInformation("Submitting proposal with title {Title}, {Description}", model!.Title, model.Description);
@@ -54,24 +57,18 @@ public class SubmitProposalFunction
 
             await _proposalStore.SubmitNewProposal(model.AuthorNickname, model.Title, model.Description);
 
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "application/json");
-
-            return response;
+            return new OkResult();
         }
         catch (ValidationException ex)
         {
-            var validationErrorResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-            await validationErrorResponse.WriteAsJsonAsync(new ErrorResponse(ex.Message));
-
-            return validationErrorResponse;
+            return new BadRequestObjectResult(new ErrorResponse(ex.Message));
         }
         catch (Exception ex)
         {
-            var serverErrorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-            await serverErrorResponse.WriteAsJsonAsync(new ErrorResponse(ex.Message));
-
-            return serverErrorResponse;
+            return new ObjectResult(new ErrorResponse(ex.Message))
+            {
+                StatusCode = (int)HttpStatusCode.InternalServerError
+            };
         }
     }
 
