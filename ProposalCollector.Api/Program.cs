@@ -1,4 +1,5 @@
 using KITT.Web.ReCaptcha.Http.v3;
+using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProposalCollector.Api.Configuration;
@@ -6,28 +7,27 @@ using ProposalCollector.Api.Services;
 using ProposalCollector.Data;
 using ProposalCollector.Data.Configuration;
 
-var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults()
-    .ConfigureServices((context, services) =>
-    {
-        services.AddHttpClient();
+var builder = FunctionsApplication.CreateBuilder(args);
+builder.ConfigureFunctionsWebApplication();
 
-        services.Configure<ProposalStoreConfiguration>(options =>
-        {
-            options.ConnectionString = context.Configuration["KittConnectionString"]!;
-        });
+builder.Services.AddMvc();
+builder.Services.AddHttpClient();
 
-        services.Configure<TextAnalyticsConfiguration>(options =>
-        {
-            options.Endpoint = context.Configuration["TextAnalyticsEndpoint"]!;
-            options.Key = context.Configuration["TextAnalyticsKey"]!;
-        });
+builder.Services.Configure<ProposalStoreConfiguration>(options =>
+{
+    options.ConnectionString = builder.Configuration["KittConnectionString"]!;
+});
 
-        services.AddReCaptchaV3HttpClient(options => options.SecretKey = context.Configuration["CaptchaSecret"]!);
-        services.AddScoped<ITextAnalyticsService, AzureTextAnalyticsService>();
+builder.Services.Configure<TextAnalyticsConfiguration>(options =>
+{
+    options.Endpoint = builder.Configuration["TextAnalyticsEndpoint"]!;
+    options.Key = builder.Configuration["TextAnalyticsKey"]!;
+});
 
-        services.AddScoped<IProposalStore, ProposalStore>();
-    })
-    .Build();
+builder.Services.AddReCaptchaV3HttpClient(options => options.SecretKey = builder.Configuration["CaptchaSecret"]!);
+builder.Services.AddScoped<ITextAnalyticsService, AzureTextAnalyticsService>();
 
+builder.Services.AddScoped<IProposalStore, ProposalStore>();
+
+var host = builder.Build();
 host.Run();
