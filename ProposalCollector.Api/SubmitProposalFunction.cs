@@ -36,12 +36,10 @@ public class SubmitProposalFunction
         var validationResult = ValidateModel(model);
         if (!validationResult.IsValid)
         {
-            var validationResponse = req.CreateResponse();
+            var validationResponse = req.CreateResponse(HttpStatusCode.BadRequest);
             if (!string.IsNullOrWhiteSpace(validationResult.ErrorMessage))
             {
-                await validationResponse.WriteAsJsonAsync(
-                    new ErrorResponse(validationResult.ErrorMessage),
-                    HttpStatusCode.BadRequest);
+                await validationResponse.WriteAsJsonAsync(new ErrorResponse(validationResult.ErrorMessage));
             }
 
             return validationResponse;
@@ -63,19 +61,15 @@ public class SubmitProposalFunction
         }
         catch (ValidationException ex)
         {
-            var validationErrorResponse = req.CreateResponse();
-            await validationErrorResponse.WriteAsJsonAsync(
-                new ErrorResponse(ex.Message),
-                HttpStatusCode.BadRequest);
+            var validationErrorResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+            await validationErrorResponse.WriteAsJsonAsync(new ErrorResponse(ex.Message));
 
             return validationErrorResponse;
         }
         catch (Exception ex)
         {
-            var serverErrorResponse = req.CreateResponse();
-            await serverErrorResponse.WriteAsJsonAsync(
-                new ErrorResponse(ex.Message),
-                HttpStatusCode.InternalServerError);
+            var serverErrorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
+            await serverErrorResponse.WriteAsJsonAsync(new ErrorResponse(ex.Message));
 
             return serverErrorResponse;
         }
